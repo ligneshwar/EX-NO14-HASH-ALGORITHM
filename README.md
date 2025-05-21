@@ -1,82 +1,81 @@
-# EX-NO-13-MESSAGE-AUTHENTICATION-CODE-MAC
+# EX-NO14-HASH-ALGORITHM
 
 ## AIM:
-To implement MESSAGE AUTHENTICATION CODE(MAC)
+To implement HASH ALGORITHM
 
 ## ALGORITHM:
 
-1. Message Authentication Code (MAC) is a cryptographic technique used to verify the integrity and authenticity of a message by using a secret key.
+1. Hash Algorithm is used to convert input data (message) into a fixed-size string, typically a hash value, which uniquely represents the original data.
 
 2. Initialization:
-   - Choose a cryptographic hash function \( H \) (e.g., SHA-256) and a secret key \( K \).
-   - The message \( M \) to be authenticated is input along with the secret key \( K \).
+   - Choose a hash function \( H \) (e.g., SHA-256, MD5, etc.).
+   - The message \( M \) to be hashed is input.
 
-3. MAC Generation:
-   - Compute the MAC by applying the hash function to the combination of the message \( M \) and the secret key \( K \): 
-     \[
-     \text{MAC}(M, K) = H(K || M)
-     \]
-     where \( || \) denotes concatenation of \( K \) and \( M \).
+3. Message Preprocessing:
+   - Break the message \( M \) into fixed-size blocks. If necessary, pad the message to make it compatible with the block size required by the hash function.
+   - For example, in SHA-256, the message is padded to ensure that its length is a multiple of 512 bits.
 
-4. Verification:
-   - The recipient, who knows the secret key \( K \), computes the MAC using the received message \( M \) and the same hash function.
-   - The recipient compares the computed MAC with the received MAC. If they match, the message is authentic and unchanged.
+4. Hash Calculation:
+   - Process the message block by block, applying the hash function \( H \) iteratively to produce an intermediate hash value.
+   - For SHA-256, each block is processed through a series of logical operations, bitwise manipulations, and modular additions.
 
-5. Security: The security of the MAC relies on the secret key \( K \) and the strength of the hash function \( H \), ensuring that an attacker cannot forge a valid MAC without knowledge of the key.
+5. Output:
+   - After all blocks are processed, the final hash value (digest) is produced, which is a fixed-size output (e.g., 256-bit for SHA-256).
+   - The resulting hash is unique to the input message, meaning even a small change in the message will result in a completely different hash.
+
+6. Security: The strength of the hash algorithm lies in its collision resistance, ensuring that it is computationally infeasible to find two different messages that produce the same hash value.
+
 
 ## Program:
 ```
+NAME: HARITHA RAMESH
+REG NUM: 212223100011
+
 #include <stdio.h>
 #include <string.h>
 
-#define MAC_SIZE 32 // Define MAC size in bytes
 
-// Function to compute a simple MAC using XOR
-void computeMAC(const char *key, const char *message, char *mac) {
-    int key_len = strlen(key);
-    int msg_len = strlen(message);
-    
-    // XOR the key and message, repeating if necessary
-    for (int i = 0; i < MAC_SIZE; i++) {
-        mac[i] = key[i % key_len] ^ message[i % msg_len]; // Simple XOR operation
+void computeSimpleHash(const char *message, unsigned char *hash) {
+    unsigned char temp = 0;
+
+   
+    for (int i = 0; message[i] != '\0'; i++) {
+        temp = temp ^ message[i]; 
+        temp += message[i];       
     }
-    mac[MAC_SIZE] = '\0'; // Null-terminate the MAC string
+    
+ 
+    *hash = temp;
 }
 
 int main() {
-    char key[100], message[100];
-    char mac[MAC_SIZE + 1]; // Buffer for MAC (+1 for null terminator)
-    char receivedMAC[MAC_SIZE + 1]; // Buffer for input of received MAC
+    char message[256];     
+    unsigned char hash;     
+    char receivedHash[3];  
 
-    // Step 1: Input secret key
-    printf("Enter the secret key: ");
-    scanf("%s", key);
-
-    // Step 2: Input the message
+   
     printf("Enter the message: ");
     scanf("%s", message);
 
-    // Step 3: Compute the MAC
-    computeMAC(key, message, mac);
+   
+    computeSimpleHash(message, &hash);
 
-    // Step 4: Display the computed MAC in hexadecimal
-    printf("Computed MAC (in hex): ");
-    for (int i = 0; i < MAC_SIZE; i++) {
-        printf("%02x", (unsigned char)mac[i]); // Print each byte as hex
-    }
-    printf("\n");
+  
+    printf("Computed Hash (in hex): %02x\n", hash);
 
-    // Step 5: Input the received MAC (for verification)
-    printf("Enter the received MAC (as hex): ");
-    for (int i = 0; i < MAC_SIZE; i++) {
-        scanf("%02hhx", &receivedMAC[i]);
-    }
+   
+    printf("Enter the received hash (in hex): ");
+    scanf("%s", receivedHash);
 
-    // Compare the computed MAC with the received MAC
-    if (memcmp(mac, receivedMAC, MAC_SIZE) == 0) {
-        printf("MAC verification successful. Message is authentic.\n");
+   
+    unsigned int receivedHashValue;
+    sscanf(receivedHash, "%02x", &receivedHashValue);
+
+    
+    if (hash == receivedHashValue) {
+        printf("Hash verification successful. Message is unchanged.\n");
     } else {
-        printf("MAC verification failed. Message is not authentic.\n");
+        printf("Hash verification failed. Message has been altered.\n");
     }
 
     return 0;
@@ -84,10 +83,8 @@ int main() {
 ```
 
 
-
 ## Output:
-![Screenshot 2025-05-10 113935](https://github.com/user-attachments/assets/f40c438d-7ebd-4509-8f37-bd272f75694c)
-
+![Screenshot 2025-05-15 080415](https://github.com/user-attachments/assets/ed25bae6-6049-4911-831a-79c355fdcab8)
 
 ## Result:
 The program is executed successfully.
